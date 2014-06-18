@@ -1,5 +1,8 @@
-require "quire/version"
+require 'quire/version'
+require 'quire/sample'
 
 module Quire
-  # Your code goes here...
+  def self.new(source, options = {})
+    Quire::Sample.new(source, options)
+  end
 end
