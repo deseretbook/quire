@@ -50,8 +50,12 @@ sample.write # if destination path was passed in constructor options
 
 ## TODO
 
+* validate created sample with epubcheck.
+* remove multi_xml, replace with direct nokogiri calls since we're tied to nokogiri now anyway
+
+# TO-DONE
+
 * Include first pages of book: Cover, plate, dedication, full ToC page.
 * Include 10% of actual content, that number excludes the cover, plate, toc, etc. Parse the spine somehow to figure out where actual content starts?
 * new() options can override the size of the sample.
-* validate created sample with epubcheck.
 * Sample content recontexutalize using changes outlined in comments here: https://trello.com/c/BRJkm89j/
