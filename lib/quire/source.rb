@@ -25,7 +25,6 @@ class Quire::Source
   end
 
   def read_file(path)
-    puts path
     epub_zip.read(path)
   end
 

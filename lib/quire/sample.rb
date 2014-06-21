@@ -58,7 +58,7 @@ private
 
     # calculate size of sample based on percent of total
     sample_size = (total * (@sample_size.to_f / 100.0)).to_i
-    puts "Sample size (#{@sample_size}%): #{sample_size}"
+    #puts "Sample size (#{@sample_size}%): #{sample_size}"
 
     # find what content files will completly fit in the 10%
     allocated = 0
@@ -72,7 +72,7 @@ private
 
     # remove content files that are not in `keep_all` from `all_files_in_source`
     remove = source_epub.toc.nav_point_content_sources - keep_all
-    puts "Files to remove(#{remove.size}): #{remove.join(', ')}"
+    #puts "Files to remove(#{remove.size}): #{remove.join(', ')}"
     remove.each do |r|
       fn = [ source_epub.prefix, r ].join('/')
       if all_files_in_source[fn]
@@ -88,10 +88,10 @@ private
     # find which file will be partially included in sample (if any)
     keep_partial = partial_size > 0 ? keep_all.pop : nil
 
-    puts sample_size
-    puts allocated
-    puts keep_partial
-    puts partial_size
+    #puts sample_size
+    #puts allocated
+    #puts keep_partial
+    #puts partial_size
 
     if keep_partial
       fn = [ source_epub.prefix, keep_partial ].join('/')
@@ -136,7 +136,7 @@ private
     # change entries in the HTML TOC to be href="" or a sample placeholder page
     # (related to above) parse all remaining html pages and find links to removed content and either rewrite them to href="" or a sample placeholder page
 
-    puts 'fixing broken hrefs'
+    #puts 'fixing broken hrefs'
     all_files_in_source.each do |file_name, file_data|
       # go through each file, see if it contains an href to any of the files
       # previously removed and if found, replace with href=""
@@ -144,8 +144,7 @@ private
       remove.each do |r|
         if (m = file_data.match(/href\s*=\s*['|"]#{r}['|"]/))
           changed = true
-          puts "#{file_name}: #{m[0]}"
-          # puts file_data
+          #puts "#{file_name}: #{m[0]}"
           file_data.gsub!(m[0], 'href=""')
         end
       end
@@ -156,15 +155,15 @@ private
     # in <img> tags in any of the remaining files.
 
     images_in_epub = source_epub.opf.all_image_file_names
-    puts "#{images_in_epub.size} images declared in manifest"
-    puts images_in_epub.inspect
-    puts 'Seeing which ones are no longer referenced'
+    #puts "#{images_in_epub.size} images declared in manifest"
+    #puts images_in_epub.inspect
+    #puts 'Seeing which ones are no longer referenced'
     images_in_use = []
     images_in_epub.each do |image_file|
       next if images_in_use.include?(image_file)
       all_files_in_source.each do |file_name, file_data|
         if (m = file_data.match(/src\s*=\s*['|"]#{image_file}['|"]/))
-          puts "#{file_name}: #{m[0]}"
+          #puts "#{file_name}: #{m[0]}"
           images_in_use << image_file
           break
         end
@@ -175,8 +174,8 @@ private
 
     # this array should now include just images that are not referenced anywhere
     if images_to_remove.size > 0
-      puts "#{images_to_remove.size} images will be removed:"
-      puts images_to_remove.inspect
+      #puts "#{images_to_remove.size} images will be removed:"
+      #puts images_to_remove.inspect
       # remove the files
       images_to_remove.each do |image_file|
         fn = [ source_epub.prefix, image_file ].join('/')
@@ -195,7 +194,7 @@ private
         end
       end
     else
-      puts 'no ununsed images to remove'
+      #puts 'no ununsed images to remove'
     end
 
     # write changed opf
