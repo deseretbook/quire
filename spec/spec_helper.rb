@@ -24,6 +24,12 @@ RSpec.configure do |config|
     # a real object. This is generally recommended.
     mocks.verify_partial_doubles = true
   end
+
+  config.after(:suite) do
+    # delete the tempfile
+    FileUtils.rm test_epub_path
+  end
+
 end
 
 def fixture_path(filename=nil)
