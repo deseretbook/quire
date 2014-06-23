@@ -35,6 +35,6 @@ class Quire::Opf
 
   # return the file names of all the image files declared in the manifest
   def all_image_file_names
-    find_image_items.map{|i|i['href']}.uniq.compact
+    @all_image_file_names ||= find_image_items.map{|i|i['href']}.uniq.compact
   end
 end

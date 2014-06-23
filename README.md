@@ -50,8 +50,7 @@ sample.write # if destination path was passed in constructor options
 
 ## TODO
 
-* validate created sample with epubcheck.
-* remove multi_xml, replace with direct nokogiri calls since we're tied to nokogiri now anyway
+* validate created sample with epubcheck. NOTE: the epub probably won't ever pass.
 
 # TO-DONE
 

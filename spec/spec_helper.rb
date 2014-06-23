@@ -25,9 +25,11 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
+  config.before(:each) { allow_message_expectations_on_nil }
+
   config.after(:suite) do
     # delete the tempfile
-    FileUtils.rm test_epub_path
+    FileUtils.rm test_epub_path if File.exists? test_epub_path
   end
 
 end

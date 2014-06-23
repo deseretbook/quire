@@ -97,6 +97,8 @@ class Quire::Source
 protected
 
   def initialize(source, options = {})
+    # below is usually handled by subclasses calling #open_zip_file
+    @epub_zip = options.delete(:epub_zip)
     @errors = []
   end
 
