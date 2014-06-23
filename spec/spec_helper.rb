@@ -42,49 +42,10 @@ end
 
 # Compare the contents of two epub files. Expect them to be identical.
 # Checks file names and paths, and contents.
-# def expect_epub_contents_to_be_identical(test_epub_path, control_epub_path)
-#   # expect an 'unzip' command to be present.
-#   unzip_path = `which unzip` or raise 'could not find an "unzip" command'
-#   unzip_path.strip!
-
-#   # expect an 'md5sum' command to be present.
-#   md5_path = `which md5` or raise 'could not find an "unzip" command'
-#   md5_path.strip!
-
-#   test_dir = Dir.mktmpdir("epub_test")
-#   control_dir = Dir.mktmpdir("epub_control")
-
-#   `#{unzip_path} #{test_epub_path} -d #{test_dir}`
-#   `#{unzip_path} #{control_epub_path} -d #{control_dir}`
-
-#   files_in_test = Dir.glob([test_dir.to_s, '**', '*'].join('/'))
-#   files_in_control = Dir.glob([control_dir.to_s, '**', '*'].join('/'))
-
-#   it 'has the correct file names of files' do
-#     expect(
-#       files_in_test.map{|f|f.sub(test_dir.to_s, '')}.sort
-#     ).to eq(
-#       files_in_control.map{|f|f.sub(control_dir.to_s, '')}.sort
-#     )
-#   end
-
-#   # files_in_test.each do |test_file|
-#   #   next if File.directory?(test_file)
-#   #   puts '*'*80
-#   #   puts test_file
-#   #   test_md5 = `#{md5_path} -q #{test_file}`.strip
-#   #   bare_filename = test_file.sub(test_dir.to_s, '')
-#   #   puts "#{control_dir}#{bare_filename}"
-#   #   control_md5 = `#{md5_path} -q #{control_dir}#{bare_filename}`.strip
-#   #   it "has the same md5 for file #{bare_filename}" do
-#   #     puts "#{test_md5}\t#{control_md5}"
-#   #     expect(test_md5).to eq(control_md5)
-#   #   end
-#   # end
-
-# end
-
 shared_examples_for 'the fixture epub' do |control_epub_path|
+  # add path to the filename
+  control_epub_path = fixture_path(control_epub_path)
+
   # expect an 'unzip' command to be present.
   let!(:unzip_path) do
     (`which unzip` or raise 'could not find an "unzip" command').strip

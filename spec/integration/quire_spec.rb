@@ -13,17 +13,17 @@ describe 'Full sample generation' do
   let(:sample_size) { 10 } # percent, default
 
   context 'sample size at 10% (default)' do
-    it_behaves_like 'the fixture epub', fixture_path('sample_10_pct.epub')
+    it_behaves_like 'the fixture epub', 'sample_10_pct.epub'
   end
 
   context 'sample size at 1%' do
     let(:sample_size) { 1 } # percent
-    it_behaves_like 'the fixture epub', fixture_path('sample_1_pct.epub')
+    it_behaves_like 'the fixture epub', 'sample_1_pct.epub'
   end
 
   context 'source with unused image' do
     let(:fixture_input) { 'full_with_unused_image.epub' }
-    it_behaves_like 'the fixture epub', fixture_path('sample_with_unused_image_10_pct.epub')
+    it_behaves_like 'the fixture epub', 'sample_with_unused_image_10_pct.epub'
   end
 
 end
