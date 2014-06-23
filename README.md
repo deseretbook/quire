@@ -15,7 +15,10 @@ sample = Quire.new(http_url_of_source_epub)
 
 sample = Quire.new(source_epub_as_io_object)
 
-sample = Quire.new(path, { options: :here } )
+sample = Quire.new(path, {
+  sample_size: 5                      # sample size as percent of original,
+  destination: '/somewhere/else.epub' # output path of newly generated sample
+})
 ```
 
 Validate the sample (uses epubcheck, other criteria):
