@@ -77,6 +77,26 @@ private
     @toc_xml ||= Nokogiri::XML(source_epub.read_file(source_epub.toc_file_path))
   end
 
+  # This method is pretty insane spaghetti and needs to be refactored a bunch.
+  # My feeling is that there're at least two classes lurking in here that want
+  # to be broken out.
+  #
+  # The operations go like this:
+  #
+  # Find out how big the sample should be.
+  # Find out what "content files" will fit fully in to that size.
+  # Find out what "content file" will need to be truncated.
+  # Remove all the other "content files" data and update XML and HTML links.
+  # Find any image files that are now unused and remove them.
+  # Return a hash of the data that is to be written in the new sample file.
+  # .. the hash is keyed by the full path of each file inside the zip.
+  # 
+  # "Content file" means a file that is referenced in the navMap portion
+  # of the TOC file (usually db.ncx).
+  #
+  # The only reliable tests is the integration test at
+  # /spec/integration/quire_spec.rb. Feel free to refactor this method at will
+  # but make sure that test _always_passes_.
   def sample_content
     # find what content files will completly fit in the 10%
     sample_bytes_allocated = 0
@@ -133,7 +153,6 @@ private
       remove_these.each do |r|
         if (m = file_data.match(/href\s*=\s*['|"]#{r}['|"]/))
           changed = true
-          #puts "#{file_name}: #{m[0]}"
           file_data.gsub!(m[0], 'href=""')
         end
       end
@@ -147,8 +166,7 @@ private
     images_in_epub.each do |image_file|
       next if images_in_use.include?(image_file)
       all_files_in_source.each do |file_name, file_data|
-        if (m = file_data.match(/src\s*=\s*['|"]#{image_file}['|"]/))
-          #puts "#{file_name}: #{m[0]}"
+        if file_data.match(/src\s*=\s*['|"]#{image_file}['|"]/)
           images_in_use << image_file
           break
         end
