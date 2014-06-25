@@ -11,6 +11,7 @@ class Quire::Sample
   def to_s
     @sample_epub ||= build_sample
   end
+  alias :data :to_s
 
   def write(dest=nil)
     dest ||= destination
