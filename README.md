@@ -61,3 +61,4 @@ sample.write # if destination path was passed in constructor options
 * Include 10% of actual content, that number excludes the cover, plate, toc, etc. Parse the spine somehow to figure out where actual content starts?
 * new() options can override the size of the sample.
 * Sample content recontexutalize using changes outlined in comments here: https://trello.com/c/BRJkm89j/
+
