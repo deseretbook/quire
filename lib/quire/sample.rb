@@ -4,7 +4,7 @@ class Quire::Sample
     @destination = options.delete(:destination)
     @sample_size = (options.delete(:sample_size) || 10).to_i # percent of source
     @source = source
-    @source_type = detect_source_type(source)
+    @source_type = options.delete(:source_type) || detect_source_type(source)
     @source_epub = Quire::Source.build(source, @source_type, options)
   end
 
@@ -30,7 +30,7 @@ private
       else
         return :file
       end
-    when 'IO', 'StringIO', 'File'
+    when 'IO', 'StringIO', 'File', 'Tempfile'
       return :io
     else # assume String
       return :file
