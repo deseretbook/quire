@@ -1,4 +1,5 @@
 require 'quire'
+require 'digest/md5'
 
 RSpec.configure do |config|
   config.order = :random
@@ -53,11 +54,6 @@ shared_examples_for 'the fixture epub' do |control_epub_path|
     (`which unzip` or raise 'could not find an "unzip" command').strip
   end
 
-  # expect an 'md5sum' command to be present.
-  let!(:md5_path) do
-    (`which md5` or raise 'could not find an "unzip" command').strip
-  end
-
   let!(:test_dir) { Dir.mktmpdir("epub_test") }
   let!(:control_dir) { Dir.mktmpdir("epub_control") }
 
@@ -85,9 +81,11 @@ shared_examples_for 'the fixture epub' do |control_epub_path|
   it 'has matching file checksums' do
     files_in_test.each do |test_file|
       next if File.directory?(test_file)
-      test_md5 = `#{md5_path} -q #{test_file}`.strip
+      # test_md5 = `#{md5_path} -q #{test_file}`.strip
+      test_md5 = Digest::MD5.digest(File.new(test_file, 'r').read)
       bare_filename = test_file.sub(test_dir.to_s, '')
-      control_md5 = `#{md5_path} -q #{control_dir}#{bare_filename}`.strip
+      # control_md5 = `#{md5_path} -q #{control_dir}#{bare_filename}`.strip
+      control_md5 = Digest::MD5.digest(File.new("#{control_dir}#{bare_filename}", 'r').read)
 
       expect(test_md5).to eq(control_md5), "Checksum missmatch for #{bare_filename}"
     end
