@@ -19,6 +19,7 @@ class Quire::Source
   def error?
     !errors.empty?
   end
+  alias_method :errors?, :error?
 
   def file_exists?(path)
     epub_zip.file.exists?(path)

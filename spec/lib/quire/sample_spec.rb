@@ -3,7 +3,11 @@ require 'spec_helper'
 describe Quire::Sample do
   subject { Quire::Sample.new( '/some.epub' ) }
 
-  before { expect(Quire::Source).to receive(:build) }
+  let(:mock_quire_source) { double(Quire::Source, errors?: false) }
+
+  before do
+    expect(Quire::Source).to(receive(:build)).and_return(mock_quire_source)
+  end
 
   describe '.new' do
     context 'source argument' do

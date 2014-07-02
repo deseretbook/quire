@@ -21,10 +21,10 @@ class Quire::Opf
   end
 
   # Find the toc by finding first package->manifest->item entry if media-type of
-  # 'application/x-dtbncx+xml' and id of 'toc'.
+  # 'application/x-dtbncx+xml'
   def find_toc_item
     manifest_items.detect do |item|
-      item['media_type'] == 'application/x-dtbncx+xml' && item['id'] == 'toc'
+      item['media_type'] == 'application/x-dtbncx+xml'
     end
   end
 

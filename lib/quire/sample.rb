@@ -5,7 +5,11 @@ class Quire::Sample
     @sample_size = (options.delete(:sample_size) || 10).to_i # percent of source
     @source = source
     @source_type = options.delete(:source_type) || detect_source_type(source)
+    
     @source_epub = Quire::Source.build(source, @source_type, options)
+    if @source_epub.errors?
+      raise "Error loading source '#{source}'(#{source_type}): #{@source_epub.errors.join(', ')}"
+    end
   end
 
   def to_s
@@ -86,7 +90,7 @@ private
   #
   # Find out how big the sample should be.
   # Find out what "content files" will fit fully in to that size.
-  # Find out what "content file" will need to be truncated.
+  # Find out what "content file" will need to be truncated and truncate it.
   # Remove all the other "content files" data and update XML and HTML links.
   # Find any image files that are now unused and remove them.
   # Return a hash of the data that is to be written in the new sample file.
@@ -167,7 +171,12 @@ private
     images_in_epub.each do |image_file|
       next if images_in_use.include?(image_file)
       all_files_in_source.each do |file_name, file_data|
-        if file_data.match(/src\s*=\s*['|"]#{image_file}['|"]/)
+        # if file_data.match(/src\s*=\s*['|"]#{image_file}['|"]/)
+        # permissive matcher to match complicated relative paths.
+        # Matches strings like:
+        #  <imgANYTHINGimage.png"
+        #  <imgANYTHINGimage.png'
+        if file_data.downcase.match(/src\s*=\s*['|"].*#{image_file.downcase}['|"]?/)
           images_in_use << image_file
           break
         end
@@ -240,7 +249,10 @@ private
   # write mimetype without compression
   def write_mimetype_to_zip(zio, mimetype_data)
     zio.put_next_entry('mimetype', nil, nil, ::Zip::Entry::STORED)
-    zio.write mimetype_data.strip! # may have dangling crlf
+    mimetype_data.strip! if mimetype_data =~ /\n/
+
+    # write miletype file, remove any dangling CRLR/CR's that may have snuck in.
+    zio.write mimetype_data.gsub("\r\n",'').gsub("\n", '')
   end
 
   def write_file_to_zip(zio, file_name, file_data)
