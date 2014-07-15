@@ -65,8 +65,16 @@ private
   def content_sample_size_in_bytes
     return @content_sample_size_in_bytes if @content_sample_size_in_bytes
 
+    # keep track of files already used because they can appear more
+    # than once in the navMap section.
+    files_processed = []
+
     total = 0
     source_epub.toc.nav_point_content_sources.each do |source|
+      # the source may include a hash-path (blah.xhtml#foo).
+      # if it has one, strip that off first.
+      source.sub!(/#.*$/, '') if source.include?('#')
+      next if files_processed.include?(source)
       total += all_files_in_source[path_in_zip(source)].size
     end
 
