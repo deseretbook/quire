@@ -63,7 +63,7 @@ private
   # size in bytes.
   # 'content' means those pages referenced in the navMap.
   def content_sample_size_in_bytes
-    return @content_sample_size_in_bytes if @content_sample_size_in_bytes
+    return @content_sample_size_in_bytes if defined?(@content_sample_size_in_bytes)
 
     # keep track of files already used because they can appear more
     # than once in the navMap section.
@@ -160,14 +160,29 @@ private
     # Parse all remaining html/xhtml pages and find links to removed content
     # and rewrite them to href=""
     all_files_in_source.each do |file_name, file_data|
-      next unless file_data.ascii_only?
       # go through each file, see if it contains an href to any of the files
       # previously removed and if found, replace with href=""
       changed = false
       remove_these.each do |r|
-        if (m = file_data.match(/href\s*=\s*['|"]#{r}['|"]/))
-          changed = true
-          file_data.gsub!(m[0], 'href=""')
+        # begin
+        #   if (m = file_data.match(/href\s*=\s*['|"]#{r}['|"]/))
+        #     changed = true
+        #     file_data.gsub!(m[0], 'href=""')
+        #   end
+        # rescue ArgumentError => excpt
+        #   # not a great way to catch this error, but..
+        #   if excpt.message =~ /^invalid byte sequence in/
+        #     file_data = force_remove_invalid_characters_from_string(file_data)
+        #     retry
+        #   else
+        #     raise
+        #   end
+        # end 
+        match_with_encoding_protection(file_data, /href\s*=\s*['|"]#{r}['|"]/) do |m|
+          if m
+            changed = true
+            file_data.gsub!(m[0], 'href=""')
+          end
         end
       end
       all_files_in_source[file_name] = file_data if changed
@@ -180,15 +195,30 @@ private
     images_in_epub.each do |image_file|
       next if images_in_use.include?(image_file)
       all_files_in_source.each do |file_name, file_data|
-        next unless file_data.ascii_only?
         # if file_data.match(/src\s*=\s*['|"]#{image_file}['|"]/)
         # permissive matcher to match complicated relative paths.
         # Matches strings like:
         #  <imgANYTHINGimage.png"
         #  <imgANYTHINGimage.png'
-        if file_data.downcase.match(/src\s*=\s*['|"].*#{image_file.downcase}['|"]?/)
-          images_in_use << image_file
-          break
+        # begin
+        #   if file_data.downcase.match(/src\s*=\s*['|"].*#{image_file.downcase}['|"]?/)
+        #     images_in_use << image_file
+        #     break
+        #   end
+        # rescue ArgumentError => excpt
+        #   # not a great way to catch this error, but..
+        #   if excpt.message =~ /^invalid byte sequence in/
+        #     file_data = force_remove_invalid_characters_from_string(file_data)
+        #     retry
+        #   else
+        #     raise
+        #   end
+        # end
+        match_with_encoding_protection(file_data, /src\s*=\s*['|"].*#{image_file.downcase}['|"]?/) do |m|
+          if m
+            images_in_use << image_file
+            break
+          end
         end
       end
     end
@@ -268,5 +298,29 @@ private
   def write_file_to_zip(zio, file_name, file_data)
     zio.put_next_entry(file_name)
     zio.write file_data
+  end
+
+  def match_with_encoding_protection(str, regex)
+    # protection against infinite loops
+    match_with_encoding_protection_already_tried = false
+    begin
+      yield str.match(regex)
+    rescue ArgumentError => excpt
+      # not a great way to catch this specific error, but..
+      if excpt.message =~ /^invalid byte sequence in/ && !match_with_encoding_protection_already_tried
+        match_with_encoding_protection_already_tried = true
+        str = force_remove_invalid_characters_from_string(str)
+        retry
+      else
+        raise
+      end
+    end
+  end
+
+  def force_remove_invalid_characters_from_string(str)
+    original_encoding = str.encoding.name
+    # encode to 8859 and back to remove invalid characters.
+    options = { :invalid => :replace, :undef => :replace, :replace => "?" }
+    str.encode("iso-8859-1", options).encode(original_encoding, options)
   end
 end

@@ -34,7 +34,7 @@ class Quire::Source
   end
 
   def container
-    return @container if @container
+    return @container if defined?(@container)
 
     raise "Can't find container.xml at '#{CONTAINER_PATH}'" unless file_exists?(CONTAINER_PATH)
 
@@ -72,7 +72,7 @@ class Quire::Source
   end
 
   def opf
-    return @opf if @opf
+    return @opf if defined?(@opf)
 
     raise "Can't find OPF file at '#{opf_file_path}'" unless
       file_exists?(opf_file_path)
