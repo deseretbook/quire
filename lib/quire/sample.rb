@@ -55,7 +55,7 @@ private
 
   # prepend the epub #prefix to path and return it
   def path_in_zip(path)
-    [ source_epub.prefix, path ].join('/')
+    [ source_epub.prefix, URI.decode(path) ].join('/')
   end
 
   # returns the calculated content size (in bytes) of the sample based on the
