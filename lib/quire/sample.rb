@@ -160,6 +160,7 @@ private
     # Parse all remaining html/xhtml pages and find links to removed content
     # and rewrite them to href=""
     all_files_in_source.each do |file_name, file_data|
+      next unless file_data.ascii_only?
       # go through each file, see if it contains an href to any of the files
       # previously removed and if found, replace with href=""
       changed = false
@@ -179,6 +180,7 @@ private
     images_in_epub.each do |image_file|
       next if images_in_use.include?(image_file)
       all_files_in_source.each do |file_name, file_data|
+        next unless file_data.ascii_only?
         # if file_data.match(/src\s*=\s*['|"]#{image_file}['|"]/)
         # permissive matcher to match complicated relative paths.
         # Matches strings like:
