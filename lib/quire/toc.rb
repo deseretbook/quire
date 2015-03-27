@@ -18,7 +18,11 @@ private
     elsif node.kind_of? Hash
       node.keys.each do |key|
         if key == 'content'
-          found << node[key]['src']
+          if node[key].is_a? Array
+            found += node[key].map{|n| n['src']}
+          else
+            found << node[key]['src']
+          end
         else
           find_content_sources(node[key], found)
         end

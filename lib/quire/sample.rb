@@ -75,6 +75,13 @@ private
       # if it has one, strip that off first.
       source.sub!(/#.*$/, '') if source.include?('#')
       next if files_processed.include?(source)
+
+      # file referenced in TOC may not actually be in the epub file.
+      if all_files_in_source[path_in_zip(source)].nil?
+        warn "#{path_in_zip(source)} not found in all_files_in_source"
+        next
+      end
+      
       total += all_files_in_source[path_in_zip(source)].size
     end
 
@@ -114,6 +121,13 @@ private
     # find what content files will completly fit in the 10%
     sample_bytes_allocated = 0
     keep_these_completely = source_epub.toc.nav_point_content_sources.select do |source|
+      
+      # file referenced in TOC may not actually be in the epub file.
+      if all_files_in_source[path_in_zip(source)].nil?
+        warn "#{path_in_zip(source)} not found in all_files_in_source"
+        next
+      end
+
       if sample_bytes_allocated <= content_sample_size_in_bytes
         sample_bytes_allocated += all_files_in_source[path_in_zip(source)].size
         true
@@ -127,7 +141,7 @@ private
       if all_files_in_source[fn]
         all_files_in_source.delete(fn)
       else
-        raise "#{fn} not found in all_files_in_source"
+        warn "#{fn} not found in all_files_in_source"
       end
     end
 
