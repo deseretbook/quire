@@ -153,12 +153,20 @@ private
 
     if keep_partial
       fn = path_in_zip(keep_partial)
-      # truncate that partial file if there is one, and fix/close HTML tags
-      # in the new, shorter file using nokogiri magic:
-      # http://nokogiri.org/tutorials/ensuring_well_formed_markup.html
-      all_files_in_source[fn] = Nokogiri::XML(
-        all_files_in_source[fn][0..partial_size]
-      ).to_s
+
+      partial_content = all_files_in_source[fn][0..partial_size]
+
+      # we don't want to truncate the files in the header or footer, only
+      # in the <body>, so we check to make sure the opening <body> tag is
+      # present. If it *isn't* then we discard this partial.
+      if partial_content =~ /\<body/
+        # truncate that partial file if there is one, and fix/close HTML tags
+        # in the new, shorter file using nokogiri magic:
+        # http://nokogiri.org/tutorials/ensuring_well_formed_markup.html
+        all_files_in_source[fn] = Nokogiri::XML(
+          partial_content
+        ).to_s
+      end
     end
 
     # update sample so TOC (db.ncx) <content> tags have src=“” for removed
