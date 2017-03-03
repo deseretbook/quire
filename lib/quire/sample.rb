@@ -5,7 +5,7 @@ class Quire::Sample
     @sample_size = (options.delete(:sample_size) || 10).to_i # percent of source
     @source = source
     @source_type = options.delete(:source_type) || detect_source_type(source)
-    
+
     @source_epub = Quire::Source.build(source, @source_type, options)
     if @source_epub.errors?
       raise "Error loading source '#{source}'(#{source_type}): #{@source_epub.errors.join(', ')}"
@@ -48,7 +48,7 @@ private
       source_epub.entries.map do |fn|
         next if fn.to_s =~ /\/$/ # if last char is '/', it's a dir; skip.
         fd = source_epub.read_file(fn)
-        h[fn.to_s] = fd 
+        h[fn.to_s] = fd
       end
     end
   end
@@ -78,10 +78,10 @@ private
 
       # file referenced in TOC may not actually be in the epub file.
       if all_files_in_source[path_in_zip(source)].nil?
-        warn "#{path_in_zip(source)} not found in all_files_in_source"
+        warn "#content_sample_size_in_bytes: #{path_in_zip(source)} not found in all_files_in_source"
         next
       end
-      
+
       total += all_files_in_source[path_in_zip(source)].size
     end
 
@@ -110,7 +110,7 @@ private
   # Find any image files that are now unused and remove them.
   # Return a hash of the data that is to be written in the new sample file.
   # .. the hash is keyed by the full path of each file inside the zip.
-  # 
+  #
   # "Content file" means a file that is referenced in the navMap portion
   # of the TOC file (usually db.ncx).
   #
@@ -118,13 +118,21 @@ private
   # /spec/integration/quire_spec.rb. Feel free to refactor this method at will
   # but make sure that test _always_passes_.
   def sample_content
-    # find what content files will completly fit in the 10%
+    # find what content files will completly fit in the sample-size percentage.
     sample_bytes_allocated = 0
-    keep_these_completely = source_epub.toc.nav_point_content_sources.select do |source|
-      
+
+    # toc links may use anchors ("xxx.html#xyz"), so strip them out here and
+    # then remove duplicate pages.
+    keep_these_completely = source_epub
+    .toc
+    .nav_point_content_sources
+    .map{|s| s.split('#').first}
+    .uniq
+    .select do |source|
+
       # file referenced in TOC may not actually be in the epub file.
       if all_files_in_source[path_in_zip(source)].nil?
-        warn "#{path_in_zip(source)} not found in all_files_in_source"
+        warn "#sample_content A: #{path_in_zip(source)} not found in all_files_in_source"
         next
       end
 
@@ -141,7 +149,7 @@ private
       if all_files_in_source[fn]
         all_files_in_source.delete(fn)
       else
-        warn "#{fn} not found in all_files_in_source"
+        warn "#SampleContent B: #{fn} not found in all_files_in_source"
       end
     end
 
@@ -199,7 +207,7 @@ private
         #   else
         #     raise
         #   end
-        # end 
+        # end
         match_with_encoding_protection(file_data, /href\s*=\s*['|"]#{r}['|"]/) do |m|
           if m
             changed = true
@@ -236,7 +244,8 @@ private
         #     raise
         #   end
         # end
-        match_with_encoding_protection(file_data, /src\s*=\s*['|"].*#{image_file.downcase}['|"]?/) do |m|
+
+        match_with_encoding_protection(file_data, /src\s*=\s*['|"].*#{image_file}['|"]?/i) do |m|
           if m
             images_in_use << image_file
             break
@@ -254,7 +263,7 @@ private
         fn = path_in_zip(image_file)
         all_files_in_source.delete(fn)
       end
-      
+
       # remove them from the manifest
       opf_xml.search('manifest/item').each do |item|
         if images_to_remove.include?(item['href']) && item['media-type'] =~ /^image\//
@@ -299,7 +308,7 @@ private
       write_mimetype_to_zip(
         zio, epub_files.delete('mimetype') || raise('mimetype file missing!')
       )
-      
+
       epub_files.each do |file_name, file_data|
         write_file_to_zip(zio, file_name, file_data)
       end
