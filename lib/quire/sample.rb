@@ -121,13 +121,9 @@ private
     # find what content files will completly fit in the sample-size percentage.
     sample_bytes_allocated = 0
 
-    # toc links may use anchors ("xxx.html#xyz"), so strip them out here and
-    # then remove duplicate pages.
     keep_these_completely = source_epub
     .toc
     .nav_point_content_sources
-    .map{|s| s.split('#').first}
-    .uniq
     .select do |source|
 
       # file referenced in TOC may not actually be in the epub file.

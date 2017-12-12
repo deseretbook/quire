@@ -1,5 +1,9 @@
 ## Change Log
 
+### 0.1.1
+
+Better deal with anchor tags within TOC/Navmap
+
 ### 0.0.3 July 15 2014
 
 Book ID 4331:
@@ -24,4 +28,3 @@ General: Better reporting of errors when source file can't be loaded.
 ### 0.0.1 June 30 2014
 
 Initial Release
-

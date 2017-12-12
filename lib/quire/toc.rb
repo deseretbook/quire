@@ -3,11 +3,12 @@ class Quire::Toc
     @parsed_toc = MultiXml.parse(raw_xml)
   end
 
-  # returns navMap->navPoints->content_src as array order as in the toc
+  # returns navMap->navPoints->content_src as array order as in the toc, with
+  # anchors ("xxx.html#xyz") removed if they are present. Unique and sorted.
   def nav_point_content_sources
     found_content_sources = []
     find_content_sources(nav_map, found_content_sources)
-    found_content_sources.uniq.compact
+    found_content_sources.map{|s| s.split('#').first}.compact.uniq
   end
 
 private
