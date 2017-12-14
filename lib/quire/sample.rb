@@ -58,6 +58,10 @@ private
     [ source_epub.prefix, URI.decode(path) ].join('/')
   end
 
+  def nav_point_content_sources
+    @nav_point_content_sources ||= source_epub.toc.nav_point_content_sources
+  end
+
   # returns the calculated content size (in bytes) of the sample based on the
   # :sample_size constuctor option, interpreted as a percent of total content
   # size in bytes.
@@ -70,10 +74,7 @@ private
     files_processed = []
 
     total = 0
-    source_epub.toc.nav_point_content_sources.each do |source|
-      # the source may include a hash-path (blah.xhtml#foo).
-      # if it has one, strip that off first.
-      source.sub!(/#.*$/, '') if source.include?('#')
+    nav_point_content_sources.each do |source|
       next if files_processed.include?(source)
 
       # file referenced in TOC may not actually be in the epub file.
@@ -121,10 +122,7 @@ private
     # find what content files will completly fit in the sample-size percentage.
     sample_bytes_allocated = 0
 
-    keep_these_completely = source_epub
-    .toc
-    .nav_point_content_sources
-    .select do |source|
+    keep_these_completely = nav_point_content_sources.select do |source|
 
       # file referenced in TOC may not actually be in the epub file.
       if all_files_in_source[path_in_zip(source)].nil?
@@ -132,7 +130,7 @@ private
         next
       end
 
-      if sample_bytes_allocated <= content_sample_size_in_bytes
+      if sample_bytes_allocated < content_sample_size_in_bytes
         sample_bytes_allocated += all_files_in_source[path_in_zip(source)].size
         true
       end
@@ -140,7 +138,7 @@ private
 
     # remove content files that are not in `keep_these_completely` from
     # `all_files_in_source`
-    remove_these = source_epub.toc.nav_point_content_sources - keep_these_completely
+    remove_these = nav_point_content_sources - keep_these_completely
     remove_these.map{|r| path_in_zip(r) }.each do |fn|
       if all_files_in_source[fn]
         all_files_in_source.delete(fn)
@@ -151,6 +149,11 @@ private
 
     # find size of partial overrun
     partial_size = sample_bytes_allocated - content_sample_size_in_bytes
+
+    # special case for epubs with only one document in the TOC
+    if nav_point_content_sources.length == 1 && sample_bytes_allocated > content_sample_size_in_bytes
+      partial_size = content_sample_size_in_bytes
+    end
 
     # find which file will be partially included in sample (if any)
     keep_partial = partial_size > 0 ? keep_these_completely.pop : nil

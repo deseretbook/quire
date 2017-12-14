@@ -26,4 +26,11 @@ describe 'Full sample generation' do
     it_behaves_like 'the fixture epub', 'sample_with_unused_image_10_pct.epub'
   end
 
+  context 'ePub with only one document in TOC NavMap' do
+    let(:fixture_input) { 'only_one_toc_item.epub' }
+    let(:sample_size) { 10 } # percent, default
+
+    it_behaves_like 'the fixture epub', 'only_one_toc_item_sample_10_pct.epub'
+  end
+
 end

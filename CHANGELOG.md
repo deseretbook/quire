@@ -1,8 +1,14 @@
 ## Change Log
 
-### 0.1.1
+### 0.1.2 Nov 14 2017
 
-Better deal with anchor tags within TOC/Navmap
+Ensure samples are the correct size when the ePub has only one item in the TOC
+NavMap.
+
+### 0.1.1 Nov 12 2017
+
+Better deal with anchor tags within TOC/Navmap so samples are created with the
+correct size.
 
 ### 0.0.3 July 15 2014
 
