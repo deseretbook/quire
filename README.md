@@ -2,6 +2,20 @@
 
 Creates a smaller sample ePub from a larger ePub file.
 
+Sample size configurable, default is 10% of the text content of unique documents
+referenced in the table-of-contents.
+
+If the sample size limit occurs in the middle of a document, that document will
+be truncated and any open HTML tags will be closed.
+
+Files that are not referenced in the sample content not be included in the
+output ePub. This includes images, stylesheet, and other document that are not
+referenced in the table-of-contents.
+
+Link targets within the table-of-contents to documents that have been removed
+will be replaced with empty strings. This will usually be reported as an error
+within ePubCheck but most ePub readers will accept it.
+
 The name? http://en.wikipedia.org/wiki/Paper_quire#Quire
 
 ## Usage
@@ -19,15 +33,6 @@ sample = Quire.new(path, {
   sample_size: 5                      # sample size as percent of original,
   destination: '/somewhere/else.epub' # output path of newly generated sample
 })
-```
-
-Validate the sample (uses epubcheck, other criteria):
-
-```ruby
-sample.valid?
-# => false
-sample.errors
-# => [ array of epubcheck errors, other errors ]
 ```
 
 Output the generated sample epub as string:
@@ -53,7 +58,7 @@ sample.write # if destination path was passed in constructor options
 
 ## TODO
 
-* validate created sample with epubcheck. NOTE: the epub probably won't ever pass.
+* validate created sample with epubcheck. NOTE: the epub probably won't ever pass completely because of the way the links are rewritten.
 
 # TO-DONE
 
@@ -61,4 +66,3 @@ sample.write # if destination path was passed in constructor options
 * Include 10% of actual content, that number excludes the cover, plate, toc, etc. Parse the spine somehow to figure out where actual content starts?
 * new() options can override the size of the sample.
 * Sample content recontexutalize using changes outlined in comments here: https://trello.com/c/BRJkm89j/
-
