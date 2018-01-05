@@ -1,5 +1,9 @@
 ## Change Log
 
+### 0.1.3-0.1.4 Jan 2018
+
+Various changes for ePubs that are very short.
+
 ### 0.1.2 Nov 14 2017
 
 Ensure samples are the correct size when the ePub has only one item in the TOC
