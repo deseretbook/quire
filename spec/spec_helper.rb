@@ -30,7 +30,7 @@ RSpec.configure do |config|
 
   config.after(:suite) do
     # delete the tempfile
-    FileUtils.rm test_epub_path if File.exists? test_epub_path
+    FileUtils.rm test_epub_path if File.exist? test_epub_path
   end
 
 end

@@ -1,8 +1,8 @@
 class Quire::Source::Filesystem <  Quire::Source
   def initialize(source, options = {})
     super
-    
-    unless File.exists?(source)
+
+    unless File.exist?(source)
       add_error("File '#{source}' does not exist")
       return false
     end

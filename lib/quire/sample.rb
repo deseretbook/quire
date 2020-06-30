@@ -55,7 +55,7 @@ private
 
   # prepend the epub #prefix to path and return it
   def path_in_zip(path)
-    [ source_epub.prefix, URI.decode(path) ].join('/')
+    [ source_epub.prefix, CGI.unescape(path) ].join('/')
   end
 
   def nav_point_content_sources

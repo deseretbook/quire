@@ -5,9 +5,9 @@ describe Quire::Source::Filesystem do
   let(:options) { {} }
   subject { Quire::Source::Filesystem.new(path, options) }
 
-  describe '.new' do  
+  describe '.new' do
     context 'source path doesn\'t exist' do
-      before { expect( File ).to receive(:exists?).with(path).and_return(false) }
+      before { expect( File ).to receive(:exist?).with(path).and_return(false) }
       it 'sets error message' do
         expect( subject.error? ).to be_truthy
         expect( subject.errors ).to include("File '#{path}' does not exist")
@@ -15,7 +15,7 @@ describe Quire::Source::Filesystem do
     end
 
     context 'source path is a directory' do
-      before { expect( File ).to receive(:exists?).with(path).and_return(true) }
+      before { expect( File ).to receive(:exist?).with(path).and_return(true) }
       before { expect( File ).to receive(:directory?).with(path).and_return(true) }
       it 'sets error message' do
         expect( subject.error? ).to be_truthy
